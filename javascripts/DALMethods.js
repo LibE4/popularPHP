@@ -2,6 +2,7 @@
 
 var DBAPI = (function(DB){
 	DB.getSavedRepoData = function(){
+		// pull all data from database
 		return new Promise((resolve, reject)=>{
 			$.ajax({
 				method: "GET",
@@ -15,10 +16,11 @@ var DBAPI = (function(DB){
 	};
 
 	function reportSuccess(){
-		alert("Data saved successfully");
+		alert("Data saved successfully!");
 	}
 		
 	DB.addRepoData = function(newItem){
+		// save data to database
 		return new Promise((resolve, reject)=>{
 			$.ajax({
 				method: "POST",
@@ -26,19 +28,21 @@ var DBAPI = (function(DB){
 				data:JSON.stringify(newItem),
 				dataType:"json"
 			}).then((response)=>{
-				//console.log("aa", response);
 				reportSuccess();
 				resolve(response);
 			}, (error)=>{
-				//console.log("bb", error);
-				if(error.responseText.indexOf("successfully") > 0) reportSuccess();
-				else reject(error);
-				//reject(error);
+				reject(error);
 			});
+		}).catch(error => {
+			if (error.responseText.indexOf("successfully") > 0) 
+				reportSuccess();
+			else 
+				console.log(error);
 		});
 	};
 
 	DB.getSelectedRepo = function(repoId) {
+		// pull single repo data from database
 	  return new Promise((resolve, reject)=>{
 	      $.ajax({
 	        method:'GET',

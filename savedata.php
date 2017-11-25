@@ -14,10 +14,12 @@
   }
   //build query string
   function cleanData($link, $inData){
+    // process special and non-ASCII character
     $outData = $link->real_escape_string(preg_replace('/[[:^print:]]/', '', $inData));
     return $outData;
   }
-  $sql = "DELETE FROM repos;"; //empty table
+
+  $sql = "DELETE FROM repos;"; //remove old data in table
   for ($i = 0; $i < sizeof($request); $i++)
   {
     $id = cleanData($conn, $request[$i]->id);

@@ -9,3 +9,4 @@
   $result = $stmt->get_result();
   $row = $result->fetch_assoc();
   echo json_encode($row);
+  $conn->close();

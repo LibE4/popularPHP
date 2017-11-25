@@ -36,6 +36,7 @@ function showSavedView(){
 }
 
 function getDataByStar(){
+  // get repo data searched by star
   searchedData = [];
   nStars = $("#nStars").val();
   if (nStars < 1000) nStars = 1000;
@@ -44,12 +45,14 @@ function getDataByStar(){
 }
 
 function getSearchedRepo(urlPage){
+  // receive data from one or more pages
   return new Promise((resolve, reject)=>{
     $.ajax({
       url: urlPage,
       dataType: "jsonp",
       success : function( returndata )
       {
+        // collect needed data and put in array
         let dataArr = returndata.data.items;
         for(let i = 0; i < dataArr.length; i++){
           let repo = {};
@@ -64,6 +67,7 @@ function getSearchedRepo(urlPage){
         }
 
         if (returndata.meta.hasOwnProperty('Link')){
+          // recursively get data from next page if exists
           let nextURL = returndata.meta.Link[0][0];
           if (returndata.meta.Link[0][1].rel === "first"){
             reposDisplay(searchedData, null);
@@ -80,6 +84,7 @@ function getSearchedRepo(urlPage){
 }
 
 function reposDisplay(data, nColumn) {
+  // build and inject html content in DOM
   dataInDOM = "";
   let len = data.length;
   for(let i = 0; i < len; i++){
@@ -97,6 +102,7 @@ function reposDisplay(data, nColumn) {
   }
     dataInDOM += `<tr><td>Total repositories: ${len}</td></tr>`;
   if(nColumn !== 2){
+    // build and inject these content only in search page
     $("#dataDisplay").html(dataInDOM);
     if(document.getElementById("save-repo")  === null){
       $("#products").append('<button class="btn btn-success" id="save-repo">SAVE</button>');
@@ -109,6 +115,7 @@ function reposDisplay(data, nColumn) {
 } // end of reposDisplay
 
 function createModal(repo) {
+  // pop-up window for single repo detail view
   let html =  '<div id="dynamicModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirm-modal" aria-hidden="true">';
   html += '<div class="modal-dialog">';
   html += '<div class="modal-content">';
@@ -150,19 +157,21 @@ $(document).ready(function(){
   $(document).on('click', '#view-saved-repo', (e) => {
     e.preventDefault();
     showSavedView();
+    // load saved data
     DBAPI.getSavedRepoData().then(function(data){ 
       reposDisplay(data, 2);
     });
   });
 
   $(document).on('click', '#save-repo', (e) => {
+    // save data to database
     e.preventDefault();
     DBAPI.addRepoData(searchedData).then(function(data){ });
     $("#save-repo").attr("disabled", "disabled");
   });
 
-  // Get more details
   $(document).on('click', '#savedDataDisplay .repo', (e) => {
+    // Get single repo details
     let emt = event.target.closest('tr');
     DBAPI.getSelectedRepo(emt.id).then(function(repo){
       createModal(repo);
