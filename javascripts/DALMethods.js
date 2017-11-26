@@ -19,21 +19,25 @@ var DBAPI = (function(DB){
 		alert('Data saved successfully! To view saved repositories, go to or refresh "view saved PHP" page.');
 	}
 		
-	DB.addRepoData = function(newItem){
+	DB.addRepoData = function(stars){
 		// save data to database
 		return new Promise((resolve, reject)=>{
 			$.ajax({
 				method: "POST",
 				url: "savedata.php",
-				data:JSON.stringify(newItem),
+				data:{nStars:stars},
 				dataType:"json"
 			}).then((response)=>{
 				reportSuccess();
 				resolve(response);
 			}, (error)=>{
-				if(error.responseText.indexOf("successfully") > 0) reportSuccess();
-				else reject(error);
+				reject(error);
 			});
+		}).catch(error => {
+			if (error.responseText.indexOf("successfully") > 0) 
+				reportSuccess();
+			else 
+				console.log(error);
 		});
 	};
 
@@ -56,6 +60,21 @@ var DBAPI = (function(DB){
 	          "stargazers_count": data.stargazers_count
 	        };
 	        resolve(repo);
+	      },(errorResponse)=>{
+	        reject(errorResponse);
+	      });
+	  });
+	};
+
+	DB.getSearchedCount = function(stars) {
+		// pull total count of searched results
+	  return new Promise((resolve, reject)=>{
+	      $.ajax({
+	        method:'GET',
+					data:{nStars:stars},
+	        url:'gettotalcount.php'
+	      }).then((response)=>{
+	        resolve(response);
 	      },(errorResponse)=>{
 	        reject(errorResponse);
 	      });

@@ -1,14 +1,11 @@
 "use strict";
-let nStars, dataInDOM, totalCount;
-let searchedData = [];
-let token="your_token_here";
-let initURL;
+let nStars;
 let $homeView = $("#home-view");
 let $searchView = $("#search-view");
 let $savedView = $("#saved-view");
 
 function showHomeView(){
-  $homeView.addClass("show")
+  $homeView.addClass("show");
   $homeView.removeClass("hidden");
   $searchView.addClass("hidden");
   $searchView.removeClass("show");
@@ -17,7 +14,7 @@ function showHomeView(){
 }
 
 function showSearchView(){
-  $homeView.addClass("hidden")
+  $homeView.addClass("hidden");
   $homeView.removeClass("show");
   $searchView.addClass("show");
   $searchView.removeClass("hidden");
@@ -26,7 +23,7 @@ function showSearchView(){
 }
 
 function showSavedView(){
-  $homeView.addClass("hidden")
+  $homeView.addClass("hidden");
   $homeView.removeClass("show");
   $searchView.addClass("hidden");
   $searchView.removeClass("show");
@@ -34,11 +31,11 @@ function showSavedView(){
   $savedView.removeClass("hidden");
 }
 
-function resultDisplay(total_count, nStars) {
+function resultDisplay(totoal_count, nStars) {
   // build and inject search info in DOM
   let dataInDOM = "";
   dataInDOM += "<h3>Popular PHP repositories:</h3>";
-  dataInDOM += `<h3>Total ${total_count} searched results found.</h3>`;
+  dataInDOM += `<h3>Total ${totoal_count} searched results found.</h3>`;
   dataInDOM += `<h3>Minimum of stars for this search is ${nStars}.</h3>`;
   $("#dataDisplay").html(dataInDOM);
   // build new save button or activate existing one
@@ -55,7 +52,7 @@ function sentMsgDisplay() {
   $("#dataDisplay").append(dataInDOM);
 } // end of resultDisplay
 
-function reposDisplay(data) {
+function reposDisplay(data, nColumn) {
   // build and inject saved data in DOM
   let len = data.length;
   let dataInDOM = "";
@@ -101,79 +98,6 @@ function createModal(repo) {
   });
 }
 
-function getDataByStar(opt){
-  // get repo data searched by star
-  searchedData = [];
-  nStars = $("#nStars").val();
-  if (nStars < 1000) nStars = 1000;
-  initURL = `https://api.github.com/search/repositories?access_token=${token}&q=stars:>=${nStars} fork:true language:php`;
-  switch(opt){
-    case "count":
-      getSearchedCount(initURL).then((res)=>{
-        totalCount = res.data.total_count;
-        resultDisplay(totalCount, nStars);
-      });
-      break;
-    case "all":
-      getSearchedRepo(initURL).then((data)=>{
-      });
-      break;
-  }
-}
-
-function getSearchedCount(urlPage) {
-    // pull total count of searched results
-  return new Promise((resolve, reject)=>{
-    $.ajax({
-      url: urlPage,
-      dataType: "jsonp",
-      success : function( returndata )
-      {
-        resolve(returndata);
-      }
-    });
-  });
-}
-
-function getSearchedRepo(urlPage){
-  // receive data from one or more pages
-  return new Promise((resolve, reject)=>{
-    $.ajax({
-      url: urlPage,
-      dataType: "jsonp",
-      success : function( returndata )
-      {
-        // collect needed data and put in array
-        let dataArr = returndata.data.items;
-        for(let i = 0; i < dataArr.length; i++){
-          let repo = {};
-          repo.id = dataArr[i].id;
-          repo.name = dataArr[i].name;
-          repo.url = dataArr[i].url;
-          repo.pushed_at = dataArr[i].pushed_at;
-          repo.updated_at = dataArr[i].updated_at;
-          repo.description = dataArr[i].description;
-          repo.stargazers_count = dataArr[i].stargazers_count;
-          searchedData.push(repo);
-        }
-        // recursively get data from next page if exists
-        if (returndata.meta.hasOwnProperty('Link')){
-          if (returndata.meta.Link[0][1].rel === "first"){
-            DBAPI.addRepoData(searchedData).then(function(data){ });
-            return;
-          }else{
-            let nextURL = returndata.meta.Link[0][0];
-            getSearchedRepo(nextURL);
-          } 
-        }else{
-          DBAPI.addRepoData(searchedData).then(function(data){ });
-        }
-        resolve();
-      }
-    });
-  });
-}
-
 $(document).ready(function(){
 
   $(document).on('click', '#view-home-repo', (e) => {
@@ -189,38 +113,45 @@ $(document).ready(function(){
   $(document).on('click', '#view-saved-repo', (e) => {
     e.preventDefault();
     showSavedView();
+    // load saved data
     DBAPI.getSavedRepoData().then(function(data){ 
-      reposDisplay(data);
+      reposDisplay(data, 2);
     });
   });
 
   $(document).on('click', '#save-repo', (e) => {
+    // save data to database
     e.preventDefault();
-    getDataByStar("all");
-    sentMsgDisplay();
+    DBAPI.addRepoData(nStars).then(function(data){ });
     $("#save-repo").attr("disabled", "disabled");
+    sentMsgDisplay();
   });
 
-  // handle click on single repo, get repo detail
   $(document).on('click', '#savedDataDisplay .repo', (e) => {
+    // Get single repo details
     let emt = event.target.closest('tr');
     DBAPI.getSelectedRepo(emt.id).then(function(repo){
       createModal(repo);
     });
   });
 
-  // handle search input
   $("#nStars").on("keyup", (e)=>{
     nStars = $("#nStars").val();
     if(e.keyCode === 13){
-      getDataByStar("count");
+      if (nStars < 1000) nStars = 1000;
+      DBAPI.getSearchedCount(nStars).then(function(count){
+        resultDisplay(count, nStars);
+      });
     }
   });
 
-  // handle search submit
   $('#submit').on('click', (e)=>{
     e.preventDefault();
-    getDataByStar("count");
+    nStars = $("#nStars").val();
+    if (nStars < 1000) nStars = 1000;
+    DBAPI.getSearchedCount(nStars).then(function(count){
+        resultDisplay(count, nStars);
+    });
   });
 
 });
