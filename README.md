@@ -1,11 +1,11 @@
 # PopularPHP
 
 ## Description
-An web application to collect and manage information of popular PHP  repositories from GitHub.
+A web application to collect and manage information of popular PHP  repositories from GitHub.
 
 ## INSTRUCTIONS FOR INSTALLING PopularPHP
 
-NOTE: A MySQL database server and a web server with PHP up and running is required. A MySQL client (eg. phpMyAdmin) is needed as user interface for MySQL server.
+NOTE: A MySQL database server and a web server with PHP up and running are required. A MySQL client (eg. phpMyAdmin) is needed as user interface for MySQL server.
 
 1.) Copy all files in this repository onto your web server at the file location that you wish to serve it from.
 
