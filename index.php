@@ -67,8 +67,9 @@
 		<div id="home-view" class="row">
 	    <div class="col-lg-6 col-lg-offset-3">
 	    	<h1>Thanks for using PopularPHP!</h1>
-	    	<h3>To view previously saved popular PHP repositories: <a href="#" id="view-saved-repo" class="cd-btn">click here</a></h3>
-	    	<h3>To update popular PHP repositories: <a href="#" id="update-repo" class="cd-btn">click here</a></h3>
+	    	<h3><a href="#" id="view-saved-repo" class="cd-btn btn btn-lg btn-custom col-xs-12">View Previously Saved Popular PHP Repositories</a></h3>
+	    	<br><br><br>
+	    	<h3><a href="#" id="update-repo" class="cd-btn btn btn-lg btn-custom col-xs-12">Update Popular PHP Repositories</a></h3>
 	    </div>
 		</div>
 		<div id="search-view" class="row hidden">
@@ -83,39 +84,14 @@
 	      </div><!-- /input -->
 	      <div>(Hint: to avoid searched result being too big, minimum <strong>1000</strong> stars applied.)</div>
 	    </div><!-- /.col-lg-4 -->
-			<div id="products">
-				<table class="table table-bordered table-striped">
-					<caption id="tableCaption">Popular PHP repositories:</caption>
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Stars</th>
-							<th>Description</th>
-							<th>URL</th>
-							<th>Pushed At</th>
-							<th>Updated At</th>
-							<th>ID</th>
-						</tr>
-					</thead>
-					<tbody id="dataDisplay">
-						
-					</tbody>
-				</table>
+			<div class="col-lg-6 col-lg-offset-3" id="dataDisplay">
+
 			</div>
 		</div><!-- /.row -->		
 		<div id="saved-view" class="row hidden">
 			<div class="col-lg-6 col-lg-offset-3">
-				<table class="table table-bordered table-striped">
-					<caption id="tableCaption">Saved Popular PHP repositories:</caption>
-					<thead>
-						<tr>
-							<th>Repository Name</th>
-							<th>Stars</th>
-						</tr>
-					</thead>
-					<tbody id="savedDataDisplay">
-						
-					</tbody>
+				<table id="savedDataDisplay" class="table table-bordered table-striped">
+
 				</table>
 			</div>
 		</div><!-- /.row -->

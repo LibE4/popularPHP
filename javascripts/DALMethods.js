@@ -16,7 +16,7 @@ var DBAPI = (function(DB){
 	};
 
 	function reportSuccess(){
-		alert("Data saved successfully!");
+		alert('Data saved successfully! To view saved repositories, go to or refresh "view saved PHP" page.');
 	}
 		
 	DB.addRepoData = function(newItem){
@@ -31,13 +31,9 @@ var DBAPI = (function(DB){
 				reportSuccess();
 				resolve(response);
 			}, (error)=>{
-				reject(error);
+				if(error.responseText.indexOf("successfully") > 0) reportSuccess();
+				else reject(error);
 			});
-		}).catch(error => {
-			if (error.responseText.indexOf("successfully") > 0) 
-				reportSuccess();
-			else 
-				console.log(error);
 		});
 	};
 

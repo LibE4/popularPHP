@@ -1,6 +1,5 @@
 "use strict";
-let nStars, dataInDOM, totalLeft;
-let pageCount = 1;
+let nStars, dataInDOM, totalCount;
 let searchedData = [];
 let token="your_token_here";
 let initURL;
@@ -35,83 +34,43 @@ function showSavedView(){
   $savedView.removeClass("hidden");
 }
 
-function getDataByStar(){
-  // get repo data searched by star
-  searchedData = [];
-  nStars = $("#nStars").val();
-  if (nStars < 1000) nStars = 1000;
-  initURL = `https://api.github.com/search/repositories?access_token=${token}&q=stars:>=${nStars} fork:true language:php`;
-  getSearchedRepo(initURL).then((data)=>{ });
-}
+function resultDisplay(total_count, nStars) {
+  // build and inject search info in DOM
+  let dataInDOM = "";
+  dataInDOM += "<h3>Popular PHP repositories:</h3>";
+  dataInDOM += `<h3>Total ${total_count} searched results found.</h3>`;
+  dataInDOM += `<h3>Minimum of stars for this search is ${nStars}.</h3>`;
+  $("#dataDisplay").html(dataInDOM);
+  // build new save button or activate existing one
+  if(document.getElementById("save-repo")  === null){
+    $("#dataDisplay").append('<button class="btn btn-success" id="save-repo">Save Repositories</button>');
+  }else{
+    $("#save-repo").removeAttr('disabled');
+  }
+} // end of resultDisplay
 
-function getSearchedRepo(urlPage){
-  // receive data from one or more pages
-  return new Promise((resolve, reject)=>{
-    $.ajax({
-      url: urlPage,
-      dataType: "jsonp",
-      success : function( returndata )
-      {
-        // collect needed data and put in array
-        let dataArr = returndata.data.items;
-        for(let i = 0; i < dataArr.length; i++){
-          let repo = {};
-          repo.id = dataArr[i].id;
-          repo.name = dataArr[i].name;
-          repo.url = dataArr[i].url;
-          repo.pushed_at = dataArr[i].pushed_at;
-          repo.updated_at = dataArr[i].updated_at;
-          repo.description = dataArr[i].description;
-          repo.stargazers_count = dataArr[i].stargazers_count;
-          searchedData.push(repo);
-        }
+function sentMsgDisplay() {
+  // build and inject sent msg in DOM
+  let dataInDOM = "<h5>Request to save searched results in database has been sent. A notice will pop up when it is finished. Please explore other pages while waiting...</h5>";
+  $("#dataDisplay").append(dataInDOM);
+} // end of resultDisplay
 
-        if (returndata.meta.hasOwnProperty('Link')){
-          // recursively get data from next page if exists
-          let nextURL = returndata.meta.Link[0][0];
-          if (returndata.meta.Link[0][1].rel === "first"){
-            reposDisplay(searchedData, null);
-            return;
-          } 
-          getSearchedRepo(nextURL);
-        }else{
-          reposDisplay(searchedData, null);
-        }
-        resolve();
-      }
-    });
-  });
-}
-
-function reposDisplay(data, nColumn) {
-  // build and inject html content in DOM
-  dataInDOM = "";
+function reposDisplay(data) {
+  // build and inject saved data in DOM
   let len = data.length;
+  let dataInDOM = "";
+  dataInDOM += `<caption id="tableCaption">Saved Popular PHP repositories: ${len} rows total.<br>
+          (click to view detail)</caption>`;
+  dataInDOM += "<thead><tr><th>Repository Name</th><th>Stars</th></tr></thead>";
+  dataInDOM += "<tbody>";
   for(let i = 0; i < len; i++){
     dataInDOM += `<tr id=${data[i].id} class=repo>`;
       dataInDOM += `<td>${data[i].name}</td>`;
       dataInDOM += `<td>${data[i].stargazers_count}</td>`;
-      if(nColumn !== 2){
-      dataInDOM += `<td>${data[i].description}</td>`;
-      dataInDOM += `<td>${data[i].url}</td>`;
-      dataInDOM += `<td>${data[i].pushed_at}</td>`;
-      dataInDOM += `<td>${data[i].updated_at}</td>`;
-      dataInDOM += `<td>${data[i].id}</td>`;
-      }
     dataInDOM += "</tr>";
   }
-    dataInDOM += `<tr><td>Total repositories: ${len}</td></tr>`;
-  if(nColumn !== 2){
-    // build and inject these content only in search page
-    $("#dataDisplay").html(dataInDOM);
-    if(document.getElementById("save-repo")  === null){
-      $("#products").append('<button class="btn btn-success" id="save-repo">SAVE</button>');
-    }else{
-      $("#save-repo").removeAttr('disabled');
-    }
-  }else{
-    $("#savedDataDisplay").html(dataInDOM);
-  }
+  dataInDOM += "</tbody>";
+  $("#savedDataDisplay").html(dataInDOM);
 } // end of reposDisplay
 
 function createModal(repo) {
@@ -142,6 +101,79 @@ function createModal(repo) {
   });
 }
 
+function getDataByStar(opt){
+  // get repo data searched by star
+  searchedData = [];
+  nStars = $("#nStars").val();
+  if (nStars < 1000) nStars = 1000;
+  initURL = `https://api.github.com/search/repositories?access_token=${token}&q=stars:>=${nStars} fork:true language:php`;
+  switch(opt){
+    case "count":
+      getSearchedCount(initURL).then((res)=>{
+        totalCount = res.data.total_count;
+        resultDisplay(totalCount, nStars);
+      });
+      break;
+    case "all":
+      getSearchedRepo(initURL).then((data)=>{
+      });
+      break;
+  }
+}
+
+function getSearchedCount(urlPage) {
+    // pull total count of searched results
+  return new Promise((resolve, reject)=>{
+    $.ajax({
+      url: urlPage,
+      dataType: "jsonp",
+      success : function( returndata )
+      {
+        resolve(returndata);
+      }
+    });
+  });
+}
+
+function getSearchedRepo(urlPage){
+  // receive data from one or more pages
+  return new Promise((resolve, reject)=>{
+    $.ajax({
+      url: urlPage,
+      dataType: "jsonp",
+      success : function( returndata )
+      {
+        // collect needed data and put in array
+        let dataArr = returndata.data.items;
+        for(let i = 0; i < dataArr.length; i++){
+          let repo = {};
+          repo.id = dataArr[i].id;
+          repo.name = dataArr[i].name;
+          repo.url = dataArr[i].url;
+          repo.pushed_at = dataArr[i].pushed_at;
+          repo.updated_at = dataArr[i].updated_at;
+          repo.description = dataArr[i].description;
+          repo.stargazers_count = dataArr[i].stargazers_count;
+          searchedData.push(repo);
+        }
+        // recursively get data from next page if exists
+        if (returndata.meta.hasOwnProperty('Link')){
+          if (returndata.meta.Link[0][1].rel === "first"){
+            DBAPI.addRepoData(searchedData).then(function(data){ });
+            return;
+          }else{
+            let nextURL = returndata.meta.Link[0][0];
+            getSearchedRepo(nextURL);
+          } 
+        }else{
+          DBAPI.addRepoData(searchedData).then(function(data){ });
+        }
+        resolve();
+      }
+    });
+  });
+}
+
 $(document).ready(function(){
 
   $(document).on('click', '#view-home-repo', (e) => {
@@ -157,37 +189,38 @@ $(document).ready(function(){
   $(document).on('click', '#view-saved-repo', (e) => {
     e.preventDefault();
     showSavedView();
-    // load saved data
     DBAPI.getSavedRepoData().then(function(data){ 
-      reposDisplay(data, 2);
+      reposDisplay(data);
     });
   });
 
   $(document).on('click', '#save-repo', (e) => {
-    // save data to database
     e.preventDefault();
-    DBAPI.addRepoData(searchedData).then(function(data){ });
+    getDataByStar("all");
+    sentMsgDisplay();
     $("#save-repo").attr("disabled", "disabled");
   });
 
+  // handle click on single repo, get repo detail
   $(document).on('click', '#savedDataDisplay .repo', (e) => {
-    // Get single repo details
     let emt = event.target.closest('tr');
     DBAPI.getSelectedRepo(emt.id).then(function(repo){
       createModal(repo);
     });
   });
 
+  // handle search input
   $("#nStars").on("keyup", (e)=>{
     nStars = $("#nStars").val();
     if(e.keyCode === 13){
-      getDataByStar();
+      getDataByStar("count");
     }
   });
 
+  // handle search submit
   $('#submit').on('click', (e)=>{
     e.preventDefault();
-    getDataByStar();
+    getDataByStar("count");
   });
 
 });

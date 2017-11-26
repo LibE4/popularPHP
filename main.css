@@ -1,3 +1,20 @@
+.btn-custom {
+  background-color: #37493c !important;
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#d3ded6", endColorstr="#36483b");
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#d3ded6), to(#36483b));
+  background-image: -moz-linear-gradient(top, #d3ded6, #36483b);
+  background-image: -ms-linear-gradient(top, #d3ded6, #36483b);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d3ded6), color-stop(100%, #36483b));
+  background-image: -webkit-linear-gradient(top, #d3ded6, #36483b);
+  background-image: -o-linear-gradient(top, #d3ded6, #36483b);
+  background-image: linear-gradient(#d3ded6, #36483b);
+  border-color: #36483b #36483b #161d18;
+  color: #333 !important;
+  font-weight: bold !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.99);
+  -webkit-font-smoothing: antialiased; }
+
 #nav-repo{
   position: fixed;
   top: 0;
@@ -15,7 +32,7 @@ h1{
 }
 
 #main-repo{
-	padding-top: 6em;
+  padding-top: 6em;
 }
 
 caption{
@@ -24,9 +41,9 @@ caption{
 }
 
 .hidden {
-	display: none;
+  display: none;
 }
 
 .show {
-	display: block;
+  display: block;
 }
