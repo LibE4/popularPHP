@@ -9,4 +9,6 @@ define('DEBUG', false);// set to false when done testing
 define('CHARSET',"utf8"); // sets the charset of your database for communication
 define('DBDRIVER', 'mysql');// database driver to use
 define('DBPORT', 'replace_this'); // database port for connection
+
+define('PAT', 'your_token_here'); // GitHub personal access token
 ?>

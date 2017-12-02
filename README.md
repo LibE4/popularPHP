@@ -9,9 +9,11 @@ NOTE: A MySQL database server and a web server with PHP up and running are requi
 
 1.) Copy all files in this repository onto your web server at the file location that you wish to serve it from.
 
-2.) Locate "config.php" file, set those constants based on your MySQL server connection parameters. A table named "repos" will be created in the designated database the first time app runs.
+2.) This app uses Guzzle as PHP HTTP client to handle API calls, follow the instructions on http://guzzle.readthedocs.io/en/stable/overview.html to install Guzzle at the same location as mentioned above.
 
-3.) Locate "repo.js file" inside "javascripts" folder, set "token" variable with your GitHub personal access token (PAT).
+3.) Locate "config.php" file, set those constants based on your MySQL server connection parameters. A table named "repos" will be created in the designated database the first time app runs.
+
+4.) Locate "config.php" file, set "token" variable with your GitHub personal access token (PAT).
 	
 PopularPHP is ready to serve!
 

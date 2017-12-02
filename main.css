@@ -32,7 +32,7 @@ h1{
 }
 
 #main-repo{
-  padding-top: 6em;
+	padding-top: 6em;
 }
 
 caption{
@@ -41,9 +41,9 @@ caption{
 }
 
 .hidden {
-  display: none;
+	display: none;
 }
 
 .show {
-  display: block;
+	display: block;
 }
